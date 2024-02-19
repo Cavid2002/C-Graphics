@@ -1,10 +1,12 @@
 #define PI 3.14159265359
 
-#define WINDOW_W 1000
-#define WINDOW_H 1000
+#define WINDOW_W 500
+#define WINDOW_H 500
 #define FPS 1000 / 60
 #define X_MAX 500
 #define Y_MAX 500
+
+#define PIXEL_SIZE 5
 
 #define Z_MAX X_MAX + Y_MAX
 #define Z_MIN 1
@@ -51,3 +53,4 @@ typedef struct
     Point2Di p_arr[2];
     ColorD rgb;
 }  Rectangle2D;
+

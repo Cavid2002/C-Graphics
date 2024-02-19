@@ -5,6 +5,37 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static int Mat[4][4] = {
+    {1, 0, 0, 0},
+    {0, 1, 0, 0},
+    {0, 0, 1, 0},
+    {0, 0, 0, 1},
+};
+
+void loadIdent()
+{
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            if(i == j)
+            {
+                Mat[i][j] = 1;
+                continue;
+            }
+            Mat[i][j] = 0;
+        }
+    }
+}
+
+Point3Di apply_homogenius(Point3Di* p)
+{
+    Point3Di res;
+    res.x = Mat[0][0] * p->x + Mat[0][3];
+    res.y = Mat[1][1] * p->y + Mat[1][3];
+    res.z = Mat[2][2] * p->z + Mat[2][3];
+    return res;
+}
 
 Point2Di convert3D_to_2D(Point3Di* p)
 {
@@ -32,7 +63,7 @@ void swap_points(Point2Di* p1, Point2Di* p2)
 
 void putPixel(int px, int py)
 {
-    glPointSize(10);
+    glPointSize(PIXEL_SIZE);
     glBegin(GL_POINTS);
 
         glVertex2i(px, py);
@@ -220,9 +251,11 @@ void draw_verticies(Point3Di* p_arr, int count ,ColorD* rgb)
 {
     glColor3d(rgb->R, rgb->G, rgb->B);
     Point2Di temp;
+    Point3Di temp2;
     for(int i = 0; i < count; i++)
     {
-        temp = convert3D_to_2D(&p_arr[i]);
+        temp2 = apply_homogenius(&p_arr[i]);
+        temp = convert3D_to_2D(&temp2);
         temp = convert2D_to_screen(&temp);
         putPixel(temp.x, temp.y);
     }
@@ -230,10 +263,12 @@ void draw_verticies(Point3Di* p_arr, int count ,ColorD* rgb)
 
 void draw_cube(Cube* cube)
 {
+    Point3Di temp;
     Point2Di res_arr[8];
     for(int i = 0; i < 8; i++)
     {
-        res_arr[i] = convert3D_to_2D(&cube->p_arr[i]);
+        temp = apply_homogenius(&cube->p_arr[i]);
+        res_arr[i] = convert3D_to_2D(&temp);
     }
 
     draw_line(&res_arr[0], &res_arr[1], &cube->rgb);
@@ -254,14 +289,18 @@ void draw_cube(Cube* cube)
 
 }
 
-void translate3D(Point3Di* p_arr, int size, int x, int y, int z)
+void translate3D(int tx, int ty, int tz)
 {
-    for(int i = 0; i < size; i++)
-    {
-        p_arr[i].x += x;
-        p_arr[i].y += y;
-        p_arr[i].z += z;
-    }
+    Mat[0][3] = tx;
+    Mat[1][3] = ty;
+    Mat[2][3] = tz;
+}
+
+void scale3D(int sx, int sy, int sz)
+{
+    Mat[0][0] = sx;
+    Mat[1][1] = sy;
+    Mat[2][2] = sz;
 }
 
 void translate2D(Point2Di* p_arr, int count, int x, int y)

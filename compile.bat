@@ -1,0 +1,1 @@
+gcc first.c -o first -lopengl32 -lglu32 -lfreeglut && .\first.exe
